@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus | Enterprise Command Center</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
+                    colors: {
+                        zinc: { 800: '#27272a', 900: '#18181b', 950: '#09090b' },
+                        primary: '#4F46E5', // Indigo 600
+                        danger: '#ef4444',
+                        success: '#10b981'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="text-gray-300 antialiased h-screen w-screen flex flex-col overflow-hidden">
+
+    <!-- Elite Animated Background Layers -->
+    <div class="mesh-bg"></div>
+    <div class="grid-overlay"></div>
+
+    <!-- Top Navigation (Vercel/Linear Style) -->
+    <nav class="h-14 border-b border-white/10 bg-[#0A0A0B]/80 backdrop-blur-md sticky top-0 z-50 flex items-center justify-between px-6">
+        <div class="flex items-center gap-8">
+            <!-- Logo -->
+            <div class="flex items-center gap-3">
+                <div class="w-6 h-6 bg-white rounded flex items-center justify-center">
+                    <svg class="w-4 h-4 text-black" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"></path></svg>
+                </div>
+                <span class="text-sm font-semibold text-white tracking-tight">NEXUS</span>
+                <div class="h-4 w-px bg-white/20 mx-1"></div>
+                <div class="flex items-center gap-2 px-2 py-1 rounded bg-white/5 border border-white/10 cursor-pointer hover:bg-white/10 transition">
+                    <div class="w-4 h-4 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500"></div>
+                    <span class="text-xs text-white">Nepal Govt Network</span>
+                    <svg class="w-3 h-3 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </div>
+            </div>
+
+            <!-- Tab Links -->
+            <div class="hidden md:flex items-center space-x-1" id="top-nav-links">
+                <a href="#" data-target="view-overview" class="nav-item px-3 py-1.5 text-sm font-medium text-white bg-white/10 rounded-md transition-colors">Overview</a>
+                <a href="#" data-target="view-rules" class="nav-item px-3 py-1.5 text-sm font-medium text-zinc-400 hover:text-white transition-colors rounded-md">WAF Rules</a>
+                <a href="#" data-target="view-routing" class="nav-item px-3 py-1.5 text-sm font-medium text-zinc-400 hover:text-white transition-colors rounded-md">Regional Routing</a>
+                <a href="#" data-target="view-testing" class="nav-item px-3 py-1.5 text-sm font-medium text-zinc-400 hover:text-white transition-colors rounded-md flex items-center gap-2">
+                    <svg class="w-3 h-3 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                    Ethical Testing Lab
+                </a>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <!-- Command Palette -->
+            <div class="hidden lg:flex items-center bg-black/50 border border-white/10 rounded-md px-3 py-1.5 w-64 group hover:border-white/20 transition-colors cursor-text shadow-inner">
+                <svg class="w-3.5 h-3.5 text-zinc-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                <span class="text-xs text-zinc-500 flex-1">Search...</span>
+                <kbd class="bg-white/10 text-zinc-400 px-1.5 rounded border border-white/5 text-[10px] font-mono">⌘K</kbd>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <button class="w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-xs text-white hover:bg-white/20 transition" title="Profile">
+                    JD
+                </button>
+                <button onclick="window.location.href='login.html'" class="p-1.5 rounded bg-white/5 border border-white/10 text-zinc-400 hover:text-white hover:bg-white/10 transition-colors" title="Logout">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 overflow-y-auto p-6 relative z-10">
+        
+        <!-- OVERVIEW TAB -->
+        <div id="view-overview" class="view-section block max-w-[1400px] mx-auto space-y-6">
+            
+            <!-- Page Header -->
+            <div class="flex justify-between items-end animate-fade">
+                <div>
+                    <h1 class="text-2xl font-semibold text-white tracking-tight">Security Overview</h1>
+                    <p class="text-sm text-zinc-400 mt-1">Real-time threat analysis across NTC and Ncell gateways.</p>
+                </div>
+                <div class="flex gap-2">
+                    <button class="px-3 py-1.5 text-xs font-medium bg-white/5 border border-white/10 rounded-md hover:bg-white/10 transition text-white">Last 24h</button>
+                    <button id="generate-report-btn" class="px-3 py-1.5 text-xs font-medium bg-primary hover:bg-primary/90 rounded-md transition text-white shadow-lg shadow-primary/20">Generate Report</button>
+                </div>
+            </div>
+
+            <!-- Dense Metrics Row with Sparklines -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                
+                <div class="panel p-5 animate-fade flex flex-col justify-between h-32" style="animation-delay: 50ms;">
+                    <div class="flex justify-between items-start">
+                        <p class="text-xs text-zinc-400 font-medium">Total Requests</p>
+                        <span class="text-green-400 text-xs font-mono">+12%</span>
+                    </div>
+                    <div class="flex items-end justify-between">
+                        <h3 class="text-3xl font-semibold text-white tabular-nums tracking-tight" id="m-total">0</h3>
+                        <div class="w-24 h-8"><canvas id="spark1"></canvas></div>
+                    </div>
+                </div>
+                
+                <div class="panel p-5 animate-fade flex flex-col justify-between h-32" style="animation-delay: 100ms;">
+                    <div class="flex justify-between items-start">
+                        <p class="text-xs text-zinc-400 font-medium">Threats Mitigated</p>
+                        <span class="text-red-400 text-xs font-mono">+4%</span>
+                    </div>
+                    <div class="flex items-end justify-between">
+                        <div>
+                            <h3 class="text-3xl font-semibold text-danger tabular-nums tracking-tight" id="m-blocked">0</h3>
+                            <p class="text-[10px] text-zinc-500 mt-1" id="m-threat-rate">5.78% of total traffic</p>
+                        </div>
+                        <div class="w-24 h-8"><canvas id="spark2"></canvas></div>
+                    </div>
+                </div>
+
+                <div class="panel p-5 animate-fade flex flex-col justify-between h-32" style="animation-delay: 150ms;">
+                    <div class="flex justify-between items-start">
+                        <p class="text-xs text-zinc-400 font-medium">Bandwidth Saved</p>
+                    </div>
+                    <div class="flex items-end justify-between">
+                        <div>
+                            <h3 class="text-3xl font-semibold text-white tabular-nums tracking-tight" id="m-bw">0 <span class="text-sm font-normal text-zinc-500">GB</span></h3>
+                            <p class="text-[10px] text-zinc-500 mt-1">Blocked payload reduction</p>
+                        </div>
+                        <div class="w-24 h-8"><canvas id="spark3"></canvas></div>
+                    </div>
+                </div>
+
+                <div class="panel p-5 animate-fade flex flex-col justify-between h-32" style="animation-delay: 200ms;">
+                    <div class="flex justify-between items-start">
+                        <p class="text-xs text-zinc-400 font-medium">Edge Latency</p>
+                        <span class="badge badge-green">Optimal</span>
+                    </div>
+                    <div class="flex items-end justify-between">
+                        <div>
+                            <h3 class="text-3xl font-semibold text-white tabular-nums tracking-tight" id="m-latency">0 <span class="text-sm font-normal text-zinc-500">ms</span></h3>
+                            <p class="text-[10px] text-zinc-500 mt-1">p99: <span id="m-p99" class="text-white font-mono">2.4</span> ms &middot; <span class="font-mono">KTM-DC-01</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Charts Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade" style="animation-delay: 250ms;">
+                
+                <!-- Large Traffic Chart -->
+                <div class="panel p-6 lg:col-span-2">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-sm font-semibold text-white">HTTP Edge Traffic</h2>
+                        <div class="flex gap-3">
+                            <span class="flex items-center gap-2 text-xs text-zinc-400"><div class="w-2 h-2 rounded-full bg-primary"></div> Allowed</span>
+                            <span class="flex items-center gap-2 text-xs text-zinc-400"><div class="w-2 h-2 rounded-full bg-danger"></div> Blocked</span>
+                            <span class="flex items-center gap-2 text-xs text-zinc-400"><div class="w-2 h-2 rounded-full bg-orange-400"></div> Challenged</span>
+                        </div>
+                    </div>
+                    <div class="h-64 w-full">
+                        <canvas id="trafficChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Attack Vectors -->
+                <div class="panel p-6 flex flex-col">
+                    <h2 class="text-sm font-semibold text-white mb-6">Top Attack Vectors</h2>
+                    <div class="flex-1 relative flex items-center justify-center">
+                        <div class="h-40 w-full"><canvas id="vectorChart"></canvas></div>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                            <span class="text-2xl font-bold text-white tracking-tight">4.2k</span>
+                            <span class="text-[10px] text-zinc-500 uppercase tracking-widest">Events</span>
+                        </div>
+                    </div>
+                    <div class="mt-4 space-y-2" id="vector-legend">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Alerts + Threat Origin -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-fade" style="animation-delay: 280ms;">
+                
+                <!-- Recent Alerts -->
+                <div class="panel p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-sm font-semibold text-white flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> Recent Alerts</h2>
+                        <span class="text-[10px] text-zinc-500 font-mono" id="alert-timer"></span>
+                    </div>
+                    <div class="space-y-3" id="alerts-feed">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Threat Origin -->
+                <div class="panel p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-sm font-semibold text-white">Threat Origin</h2>
+                        <div class="flex gap-3 text-[10px] text-zinc-500">
+                            <span>Unique IPs: <span class="text-white font-mono" id="origin-ips">1,842</span></span>
+                            <span>Countries: <span class="text-white font-mono" id="origin-countries">6</span></span>
+                            <span>Auto-blocked: <span class="text-red-400 font-mono" id="origin-blocked">312</span></span>
+                        </div>
+                    </div>
+                    <div class="space-y-3" id="origin-bars">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- High Performance Data Grid -->
+            <div class="panel overflow-hidden flex flex-col animate-fade" style="animation-delay: 300ms;">
+                <div class="px-6 py-4 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
+                    <h2 class="text-sm font-semibold text-white flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> Live Security Events
+                    </h2>
+                    <button class="text-xs text-primary hover:text-indigo-400 transition-colors">View All Logs &rarr;</button>
+                </div>
+                <div class="flex-1 overflow-x-auto">
+                    <table class="w-full text-left text-xs whitespace-nowrap">
+                        <thead class="text-zinc-400 border-b border-white/5">
+                            <tr>
+                                <th class="px-6 py-3 font-medium">Timestamp</th>
+                                <th class="px-6 py-3 font-medium">Source IP</th>
+                                <th class="px-6 py-3 font-medium">Signature / Rule Triggered</th>
+                                <th class="px-6 py-3 font-medium">Edge Node</th>
+                                <th class="px-6 py-3 font-medium text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-zinc-300 font-mono text-[11px]" id="event-table">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROUTING TAB -->
+        <div id="view-routing" class="view-section hidden max-w-[1400px] mx-auto space-y-6 animate-fade">
+            
+            <div class="flex justify-between items-end">
+                <div>
+                    <h1 class="text-2xl font-semibold text-white tracking-tight">Regional Routing Topology</h1>
+                    <p class="text-sm text-zinc-400 mt-1">BGP Map and Edge Node Health for Nepal Datacenters.</p>
+                </div>
+                <div class="flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-1.5 rounded-md">
+                    <span class="status-dot status-active"></span>
+                    <span class="text-xs font-medium text-white">Global Anycast: Optimal</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="panel p-5 relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-blue-500/10 rounded-bl-full border-l border-b border-blue-500/20 blur-md"></div>
+                    <div class="flex justify-between items-start mb-6 relative z-10">
+                        <div>
+                            <h3 class="text-lg font-bold text-white font-mono tracking-tight">KTM-DC-01</h3>
+                            <p class="text-[10px] text-zinc-400 uppercase tracking-widest mt-1">Kathmandu Core</p>
+                        </div>
+                        <span class="badge badge-green">Healthy</span>
+                    </div>
+                    <div class="space-y-3 relative z-10">
+                        <div class="flex justify-between text-xs"><span class="text-zinc-400">Latency</span><span class="text-white font-mono tabular-nums">1.2ms</span></div>
+                        <div class="flex justify-between text-xs"><span class="text-zinc-400">Load</span><span class="text-white font-mono tabular-nums">42%</span></div>
+                        <div class="w-full bg-black/50 h-1 rounded-full overflow-hidden"><div class="bg-blue-500 h-full rounded-full" style="width: 42%"></div></div>
+                    </div>
+                </div>
+                
+                <div class="panel p-5 relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-purple-500/10 rounded-bl-full border-l border-b border-purple-500/20 blur-md"></div>
+                    <div class="flex justify-between items-start mb-6 relative z-10">
+                        <div>
+                            <h3 class="text-lg font-bold text-white font-mono tracking-tight">PKR-EDGE-02</h3>
+                            <p class="text-[10px] text-zinc-400 uppercase tracking-widest mt-1">Pokhara Edge</p>
+                        </div>
+                        <span class="badge badge-green">Healthy</span>
+                    </div>
+                    <div class="space-y-3 relative z-10">
+                        <div class="flex justify-between text-xs"><span class="text-zinc-400">Latency</span><span class="text-white font-mono tabular-nums">4.5ms</span></div>
+                        <div class="flex justify-between text-xs"><span class="text-zinc-400">Load</span><span class="text-white font-mono tabular-nums">28%</span></div>
+                        <div class="w-full bg-black/50 h-1 rounded-full overflow-hidden"><div class="bg-purple-500 h-full rounded-full" style="width: 28%"></div></div>
+                    </div>
+                </div>
+
+                <div class="panel p-5 relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-yellow-500/10 rounded-bl-full border-l border-b border-yellow-500/20 blur-md"></div>
+                    <div class="flex justify-between items-start mb-6 relative z-10">
+                        <div>
+                            <h3 class="text-lg font-bold text-white font-mono tracking-tight">LAL-DC-03</h3>
+                            <p class="text-[10px] text-zinc-400 uppercase tracking-widest mt-1">Lalitpur Sync</p>
+                        </div>
+                        <span class="badge badge-blue">Syncing</span>
+                    </div>
+                    <div class="space-y-3 relative z-10">
+                        <div class="flex justify-between text-xs"><span class="text-zinc-400">Latency</span><span class="text-white font-mono tabular-nums">2.1ms</span></div>
+                        <div class="flex justify-between text-xs"><span class="text-zinc-400">Load</span><span class="text-white font-mono tabular-nums">85%</span></div>
+                        <div class="w-full bg-black/50 h-1 rounded-full overflow-hidden"><div class="bg-yellow-500 h-full rounded-full" style="width: 85%"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Elite BGP Routing Table -->
+            <div class="panel overflow-hidden flex flex-col">
+                <div class="px-6 py-4 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
+                    <h2 class="text-sm font-semibold text-white">Active ISP Peering (Nepal)</h2>
+                    <button class="text-xs text-primary hover:text-indigo-400 transition-colors">Export Map &darr;</button>
+                </div>
+                <div class="flex-1 overflow-x-auto">
+                    <table class="w-full text-left text-xs whitespace-nowrap">
+                        <thead class="text-zinc-400 border-b border-white/5">
+                            <tr>
+                                <th class="px-6 py-3 font-medium">ASN</th>
+                                <th class="px-6 py-3 font-medium">Provider Name</th>
+                                <th class="px-6 py-3 font-medium">Prefixes Announced</th>
+                                <th class="px-6 py-3 font-medium">Status</th>
+                                <th class="px-6 py-3 font-medium text-right">Traffic Share</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-zinc-300">
+                            <tr class="table-row">
+                                <td class="px-6 py-4 font-mono">AS17501</td>
+                                <td class="px-6 py-4 text-white font-medium">Nepal Telecom (NTC)</td>
+                                <td class="px-6 py-4 text-zinc-400 font-mono tabular-nums">2,140</td>
+                                <td class="px-6 py-4"><span class="text-green-400 flex items-center gap-2"><div class="status-dot status-active"></div> Established</span></td>
+                                <td class="px-6 py-4 text-right font-mono tabular-nums text-white">45.2%</td>
+                            </tr>
+                            <tr class="table-row">
+                                <td class="px-6 py-4 font-mono">AS45366</td>
+                                <td class="px-6 py-4 text-white font-medium">Ncell Axiata</td>
+                                <td class="px-6 py-4 text-zinc-400 font-mono tabular-nums">1,890</td>
+                                <td class="px-6 py-4"><span class="text-green-400 flex items-center gap-2"><div class="status-dot status-active"></div> Established</span></td>
+                                <td class="px-6 py-4 text-right font-mono tabular-nums text-white">32.8%</td>
+                            </tr>
+                            <tr class="table-row">
+                                <td class="px-6 py-4 font-mono">AS17506</td>
+                                <td class="px-6 py-4 text-white font-medium">WorldLink Communications</td>
+                                <td class="px-6 py-4 text-zinc-400 font-mono tabular-nums">4,521</td>
+                                <td class="px-6 py-4"><span class="text-yellow-400 flex items-center gap-2"><div class="status-dot status-warning"></div> Re-routing</span></td>
+                                <td class="px-6 py-4 text-right font-mono tabular-nums text-white">18.5%</td>
+                            </tr>
+                            <tr class="table-row">
+                                <td class="px-6 py-4 font-mono text-primary">AS151396</td>
+                                <td class="px-6 py-4 text-white font-medium">Sajilo Net Pvt Ltd</td>
+                                <td class="px-6 py-4 text-zinc-400 font-mono tabular-nums">214 <span class="text-[10px] text-zinc-500 ml-1">(Upstream AS45274)</span></td>
+                                <td class="px-6 py-4"><span class="text-green-400 flex items-center gap-2"><div class="status-dot status-active"></div> Established</span></td>
+                                <td class="px-6 py-4 text-right font-mono tabular-nums text-primary">2.0%</td>
+                            </tr>
+                            <tr class="table-row">
+                                <td class="px-6 py-4 font-mono">AS133658</td>
+                                <td class="px-6 py-4 text-white font-medium">Vianet Communications</td>
+                                <td class="px-6 py-4 text-zinc-400 font-mono tabular-nums">842</td>
+                                <td class="px-6 py-4"><span class="text-green-400 flex items-center gap-2"><div class="status-dot status-active"></div> Established</span></td>
+                                <td class="px-6 py-4 text-right font-mono tabular-nums text-white">1.5%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- RULES TAB -->
+        <div id="view-rules" class="view-section hidden max-w-[1400px] mx-auto space-y-6 animate-fade">
+            
+            <div class="flex justify-between items-end">
+                <div>
+                    <h1 class="text-2xl font-semibold text-white tracking-tight">WAF Rules Engine</h1>
+                    <p class="text-sm text-zinc-400 mt-1">Manage managed rulesets, custom signatures, and rate limiting policies.</p>
+                </div>
+                <div class="flex gap-2">
+                    <button class="px-3 py-1.5 text-xs font-medium bg-white/5 border border-white/10 rounded-md hover:bg-white/10 transition text-white">Import Rules</button>
+                    <button id="create-rule-btn" class="px-3 py-1.5 text-xs font-medium bg-primary hover:bg-primary/90 rounded-md transition text-white flex items-center gap-2 shadow-lg shadow-primary/20">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        Create Custom Rule
+                    </button>
+                </div>
+            </div>
+
+            <!-- Rules Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="panel p-5">
+                    <p class="text-xs text-zinc-400 font-medium mb-1">Total Active Rules</p>
+                    <h3 class="text-2xl font-semibold text-white tabular-nums">1,248</h3>
+                </div>
+                <div class="panel p-5">
+                    <p class="text-xs text-zinc-400 font-medium mb-1">OWASP Core Ruleset</p>
+                    <div class="flex items-center gap-2">
+                        <h3 class="text-2xl font-semibold text-white tabular-nums">v3.3.2</h3>
+                        <span class="badge badge-green">Enforcing</span>
+                    </div>
+                </div>
+                <div class="panel p-5">
+                    <p class="text-xs text-zinc-400 font-medium mb-1">Custom Signatures</p>
+                    <h3 class="text-2xl font-semibold text-white tabular-nums">24</h3>
+                </div>
+                <div class="panel p-5">
+                    <p class="text-xs text-zinc-400 font-medium mb-1">Rules Updated</p>
+                    <h3 class="text-2xl font-semibold text-white">2 hrs ago</h3>
+                </div>
+            </div>
+
+            <!-- Rules Configuration -->
+            <div class="panel overflow-hidden flex flex-col">
+                <div class="px-6 py-4 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
+                    <div class="flex items-center gap-4">
+                        <h2 class="text-sm font-semibold text-white">Managed Rulesets</h2>
+                        <div id="rules-filter-tabs" class="flex bg-black/50 rounded p-1 border border-white/5">
+                            <button data-cat="all" class="rules-tab px-3 py-1 text-xs text-white bg-white/10 rounded shadow-sm">All</button>
+                            <button data-cat="owasp" class="rules-tab px-3 py-1 text-xs text-zinc-500 hover:text-white transition">OWASP</button>
+                            <button data-cat="bots" class="rules-tab px-3 py-1 text-xs text-zinc-500 hover:text-white transition">Bots</button>
+                            <button data-cat="custom" class="rules-tab px-3 py-1 text-xs text-zinc-500 hover:text-white transition">Custom</button>
+                        </div>
+                    </div>
+                    <div class="relative w-64">
+                        <svg class="w-4 h-4 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        <input id="rules-search" type="text" class="w-full bg-black/50 border border-white/10 rounded-md py-1.5 pl-9 pr-3 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-primary transition-colors" placeholder="Search rules (e.g. SQLi)...">
+                    </div>
+                </div>
+                
+                <div class="flex-1 overflow-x-auto">
+                    <table class="w-full text-left text-xs whitespace-nowrap">
+                        <thead class="text-zinc-400 border-b border-white/5">
+                            <tr>
+                                <th class="px-6 py-3 font-medium w-12">Status</th>
+                                <th class="px-6 py-3 font-medium">Ruleset Name</th>
+                                <th class="px-6 py-3 font-medium">Description</th>
+                                <th class="px-6 py-3 font-medium">Action</th>
+                                <th class="px-6 py-3 font-medium text-right">Rule Count</th>
+                                <th class="px-6 py-3 font-medium w-10"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="rules-table-body" class="text-zinc-300">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ETHICAL TESTING LAB TAB -->
+        <div id="view-testing" class="view-section hidden max-w-[1400px] mx-auto space-y-6 animate-fade">
+            
+            <div class="flex justify-between items-end">
+                <div>
+                    <h1 class="text-2xl font-semibold text-white tracking-tight flex items-center gap-3">
+                        <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                        Controlled Lab Environment
+                    </h1>
+                    <p class="text-sm text-zinc-400 mt-1">Ethical testing tools integration for active WAF assessment and vulnerability simulation.</p>
+                </div>
+                <div class="flex items-center gap-2 bg-red-500/10 border border-red-500/20 px-3 py-1.5 rounded-md">
+                    <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                    <span class="text-xs font-medium text-red-400">Live Simulation Mode Active</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Burp Suite Panel -->
+                <div class="panel p-6 border-t-2 border-t-orange-500 hover:border-orange-500 transition-colors group">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center text-orange-500">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                            </div>
+                            <div>
+                                <h3 class="text-white font-medium">Burp Suite Integration</h3>
+                                <p class="text-[10px] text-zinc-500 font-mono">PROXY: 127.0.0.1:8080</p>
+                            </div>
+                        </div>
+                        <button id="burp-proxy-btn" class="text-xs bg-orange-500/20 text-orange-400 px-2 py-1 rounded hover:bg-orange-500/30 transition shadow-sm">Start Proxy</button>
+                    </div>
+                    <p class="text-xs text-zinc-400 mb-4 line-clamp-2">HTTP traffic interception and manual payload injection testing against WAF rule sets.</p>
+                    <div id="burp-logs-container" class="bg-black/50 rounded-md p-3 font-mono text-[10px] text-green-400 h-24 overflow-y-auto shadow-inner border border-white/5">
+                        > Proxy Offline<br>
+                        > Click Start Proxy to begin...
+                    </div>
+                </div>
+
+                <!-- SQLMap Panel -->
+                <div class="panel p-6 border-t-2 border-t-blue-500 hover:border-blue-500 transition-colors group">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
+                            </div>
+                            <div>
+                                <h3 class="text-white font-medium">SQLMap Automation</h3>
+                                <p class="text-[10px] text-zinc-500 font-mono">TARGET: VULN-ENDPOINT-01</p>
+                            </div>
+                        </div>
+                        <button id="sqlmap-btn" class="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded hover:bg-blue-500/30 transition shadow-sm">Run Scan</button>
+                    </div>
+                    <p class="text-xs text-zinc-400 mb-4 line-clamp-2">Automated SQL Injection and WAF evasion payload generation.</p>
+                    <div id="sqlmap-logs" class="bg-black/50 rounded-md p-3 font-mono text-[10px] text-zinc-300 h-24 overflow-y-auto shadow-inner border border-white/5">
+                        <span class="text-blue-400">sqlmap -u "http://target/api?id=1" --random-agent --level 3</span><br>
+                        [*] starting @ 14:02:11<br>
+                        [!] WAF/IPS identified: Nexus WAF<br>
+                        [*] Testing evasion techniques...
+                    </div>
+                </div>
+
+                <!-- WafW00f Panel -->
+                <div class="panel p-6 border-t-2 border-t-purple-500 hover:border-purple-500 transition-colors group">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-500">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
+                            </div>
+                            <div>
+                                <h3 class="text-white font-medium">WafW00f Probing</h3>
+                                <p class="text-[10px] text-zinc-500 font-mono">FINGERPRINTING ENGINE</p>
+                            </div>
+                        </div>
+                        <button id="wafw00f-btn" class="text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded hover:bg-purple-500/30 transition shadow-sm">Analyze</button>
+                    </div>
+                    <p class="text-xs text-zinc-400 mb-4 line-clamp-2">WAF fingerprinting, identification, and bypass validation.</p>
+                    <div id="wafw00f-logs" class="bg-black/50 rounded-md p-3 font-mono text-[10px] text-zinc-300 h-24 overflow-y-auto shadow-inner border border-white/5">
+                        <span class="text-purple-400">wafw00f https://edge.nexus.local</span><br>
+                        [+] Checking for WAF presence...<br>
+                        [+] WAF detected: Nexus Enterprise<br>
+                        [+] Reason: Block page pattern match
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactive Payload Sandbox -->
+            <div class="panel p-6 mt-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-sm font-semibold text-white">Manual Payload Sandbox</h2>
+                    <span class="text-xs text-zinc-500 bg-white/5 px-2 py-1 rounded">Environment: HTTP POST</span>
+                </div>
+                <div class="flex flex-col md:flex-row gap-6">
+                    <div class="flex-1">
+                        <label class="block text-xs text-zinc-400 mb-2 uppercase tracking-wide">Inject Payload</label>
+                        <div class="relative">
+                            <textarea id="sandbox-payload-input" class="w-full bg-black/60 border border-white/10 rounded-md p-4 text-sm text-green-400 font-mono focus:outline-none focus:border-red-500/50 transition-colors h-40 resize-none shadow-inner" placeholder="Enter payload here (e.g., ' OR 1=1 --)"></textarea>
+                            <div class="absolute bottom-4 right-4 flex gap-2">
+                                <button class="px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded text-xs text-zinc-300 transition">Templates</button>
+                                <button id="sandbox-fire-btn" class="px-3 py-1.5 bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 rounded text-xs text-red-400 transition font-medium">Fire Payload</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-full md:w-1/3">
+                        <label class="block text-xs text-zinc-400 mb-2 uppercase tracking-wide">WAF Response Analyzer</label>
+                        <div id="sandbox-response" class="bg-black/60 border border-white/5 rounded-md p-4 h-40 flex items-center justify-center flex-col text-center shadow-inner relative overflow-hidden group">
+                            <!-- Background pulse effect -->
+                            <div class="absolute inset-0 bg-red-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            
+                            <svg class="w-8 h-8 text-zinc-600 mb-3 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                            <p class="text-xs text-zinc-500 relative z-10">Waiting for payload execution...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>

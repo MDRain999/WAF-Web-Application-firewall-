@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS Enterprise Authentication</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
+                    colors: {
+                        background: '#040405',
+                        surface: '#0A0A0B',
+                        border: '#1E1E24',
+                        primary: '#4F46E5', /* Indigo 600 */
+                        primaryHover: '#4338CA',
+                        textMain: '#EDEDED',
+                        textMuted: '#8F8F8F'
+                    },
+                    animation: { 'gradient-x': 'gradient-x 15s ease infinite', 'fade-in': 'fadeIn 0.5s ease-out forwards' },
+                    keyframes: {
+                        'gradient-x': { '0%, 100%': { 'background-size': '200% 200%', 'background-position': 'left center' }, '50%': { 'background-size': '200% 200%', 'background-position': 'right center' } },
+                        'fadeIn': { '0%': { opacity: '0', transform: 'translateY(10px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #040405; color: #EDEDED; overflow: hidden; }
+        
+        /* Premium Floating Label Input */
+        .input-group { position: relative; margin-bottom: 1.5rem; }
+        .input-peer { 
+            width: 100%; background-color: #0A0A0B; border: 1px solid #1E1E24; border-radius: 6px; 
+            padding: 1.25rem 1rem 0.5rem 1rem; color: #EDEDED; font-size: 0.875rem; 
+            transition: all 0.2s ease; outline: none; box-shadow: 0 1px 2px rgba(0,0,0,0.5) inset;
+        }
+        .input-peer:focus { border-color: #4F46E5; box-shadow: 0 0 0 1px #4F46E5, 0 1px 2px rgba(0,0,0,0.5) inset; }
+        .input-label {
+            position: absolute; left: 1rem; top: 1rem; color: #8F8F8F; font-size: 0.875rem;
+            pointer-events: none; transition: all 0.2s ease; transform-origin: left top;
+        }
+        /* Float the label when focused or when input has value (using required/valid pseudo-class trick) */
+        .input-peer:focus + .input-label,
+        .input-peer:not(:placeholder-shown) + .input-label {
+            transform: translateY(-0.6rem) scale(0.75); color: #8F8F8F;
+        }
+        .input-peer:focus + .input-label { color: #4F46E5; }
+
+        /* Bespoke Mesh Gradient Background for Left Panel */
+        .mesh-bg {
+            background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #0f0c29);
+            background-size: 400% 400%;
+            animation: gradient-x 15s ease infinite;
+            position: relative;
+        }
+        .mesh-bg::after {
+            content: ''; position: absolute; inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        /* Subtle scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #1E1E24; }
+    </style>
+</head>
+<body class="flex h-screen w-screen font-sans antialiased">
+
+    <!-- LEFT PANEL: Enterprise Branding & Visuals -->
+    <div class="hidden lg:flex w-[45%] mesh-bg flex-col justify-between p-12 border-r border-border relative overflow-hidden">
+        
+        <!-- Abstract glowing orbs -->
+        <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-600/20 rounded-full blur-[100px] pointer-events-none"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-[100px] pointer-events-none"></div>
+
+        <div class="relative z-10 flex items-center gap-3">
+            <div class="w-8 h-8 bg-white rounded-md flex items-center justify-center">
+                <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"></path></svg>
+            </div>
+            <span class="text-xl font-bold tracking-tight text-white">NEXUS</span>
+        </div>
+
+        <div class="relative z-10">
+            <h1 class="text-4xl font-medium leading-tight text-white mb-6">
+                Next-generation threat <br>intelligence for Nepal's <br>critical infrastructure.
+            </h1>
+            <div class="flex items-center gap-4 text-sm text-white/60 font-mono">
+                <span class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div> Kathmandu Edge Active</span>
+                <span>|</span>
+                <span>v3.2.0 Enterprise</span>
+            </div>
+        </div>
+        
+        <div class="relative z-10 text-xs text-white/40 font-mono">
+            &copy; 2026 Nexus Security Systems. <br>Authorized access only.
+        </div>
+    </div>
+
+    <!-- RIGHT PANEL: Authentication Flow -->
+    <div class="flex-1 flex flex-col justify-center items-center bg-background p-6 relative">
+        
+        <!-- Environment Ribbon -->
+        <div class="absolute top-0 right-0 bg-yellow-500/10 text-yellow-500 text-[10px] font-mono font-bold px-4 py-1 border-b border-l border-yellow-500/20 rounded-bl-lg uppercase tracking-widest">
+            Production Environment
+        </div>
+
+        <div class="w-full max-w-[380px] animate-fade-in">
+            
+            <!-- Mobile Logo (hidden on desktop) -->
+            <div class="flex lg:hidden items-center gap-3 mb-10 justify-center">
+                <div class="w-8 h-8 bg-white rounded-md flex items-center justify-center">
+                    <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"></path></svg>
+                </div>
+                <span class="text-xl font-bold tracking-tight text-white">NEXUS</span>
+            </div>
+
+            <!-- View 1: Login Options -->
+            <div id="view-login" class="block">
+                <h2 class="text-2xl font-semibold text-textMain mb-2 tracking-tight">Sign in to Nexus</h2>
+                <p class="text-sm text-textMuted mb-8">Enter your enterprise credentials.</p>
+
+
+
+                <form onsubmit="event.preventDefault(); window.location.href='index.html';">
+                    <div class="input-group">
+                        <input type="email" id="email" class="input-peer" placeholder=" " required>
+                        <label for="email" class="input-label">Work Email (.gov.np)</label>
+                    </div>
+                    
+                    <div class="input-group">
+                        <input type="password" id="password" class="input-peer" placeholder=" " required>
+                        <label for="password" class="input-label">Password</label>
+                    </div>
+
+                    <div class="flex items-center justify-between mb-6">
+                        <label class="flex items-center gap-2 cursor-pointer group">
+                            <div class="relative flex items-center justify-center">
+                                <input type="checkbox" class="appearance-none w-4 h-4 border border-border rounded bg-surface checked:bg-primary checked:border-primary transition-colors cursor-pointer">
+                                <svg class="absolute w-3 h-3 text-white pointer-events-none opacity-0 peer-checked:opacity-100" style="transform: translateY(1px);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                            </div>
+                            <span class="text-xs text-textMuted group-hover:text-textMain transition-colors">Remember me</span>
+                        </label>
+                        <button type="button" onclick="switchView('view-forgot')" class="text-xs text-textMuted hover:text-primary transition-colors">Forgot password?</button>
+                    </div>
+
+                    <button type="submit" class="w-full bg-primary hover:bg-primaryHover text-white font-medium py-2.5 px-4 rounded-md transition-colors shadow-[0_0_15px_rgba(79,70,229,0.3)] hover:shadow-[0_0_20px_rgba(79,70,229,0.5)]">
+                        Sign In
+                    </button>
+                </form>
+
+                <p class="text-center text-xs text-textMuted mt-8">
+                    Don't have an enterprise account? <br>
+                    <button type="button" onclick="switchView('view-register')" class="text-white hover:text-primary transition-colors mt-1 font-medium">Request Access</button>
+                </p>
+            </div>
+
+            <!-- View 2: Register -->
+            <div id="view-register" class="hidden">
+                <button type="button" onclick="switchView('view-login')" class="text-xs text-textMuted hover:text-white flex items-center gap-1 mb-6 transition-colors">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> Back to login
+                </button>
+                
+                <h2 class="text-2xl font-semibold text-textMain mb-2 tracking-tight">Request Access</h2>
+                <p class="text-sm text-textMuted mb-8">Platform access requires approval from your organization's IT admin.</p>
+
+                <form onsubmit="event.preventDefault(); alert('Access request submitted to admin.'); switchView('view-login');">
+                    <div class="input-group">
+                        <input type="text" id="reg-name" class="input-peer" placeholder=" " required>
+                        <label for="reg-name" class="input-label">Full Name</label>
+                    </div>
+                    <div class="input-group">
+                        <input type="email" id="reg-email" class="input-peer" placeholder=" " required>
+                        <label for="reg-email" class="input-label">Work Email</label>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="reg-org" class="input-peer" placeholder=" " required>
+                        <label for="reg-org" class="input-label">Organization / Department</label>
+                    </div>
+
+                    <button type="submit" class="w-full bg-white text-black hover:bg-gray-200 font-medium py-2.5 px-4 rounded-md transition-colors mt-2">
+                        Submit Request
+                    </button>
+                </form>
+            </div>
+
+            <!-- View 3: Forgot Password -->
+            <div id="view-forgot" class="hidden">
+                <button type="button" onclick="switchView('view-login')" class="text-xs text-textMuted hover:text-white flex items-center gap-1 mb-6 transition-colors">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> Back to login
+                </button>
+
+                <h2 class="text-2xl font-semibold text-textMain mb-2 tracking-tight">Reset Password</h2>
+                <p class="text-sm text-textMuted mb-8">Enter your email and we'll send a secure reset link.</p>
+
+                <form onsubmit="event.preventDefault(); alert('Reset link sent to email.'); switchView('view-login');">
+                    <div class="input-group">
+                        <input type="email" id="reset-email" class="input-peer" placeholder=" " required>
+                        <label for="reset-email" class="input-label">Email Address</label>
+                    </div>
+
+                    <button type="submit" class="w-full bg-primary hover:bg-primaryHover text-white font-medium py-2.5 px-4 rounded-md transition-colors">
+                        Send Reset Link
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function switchView(targetId) {
+            const views = ['view-login', 'view-register', 'view-forgot'];
+            views.forEach(id => {
+                const el = document.getElementById(id);
+                el.classList.add('hidden');
+                el.classList.remove('block', 'animate-fade-in');
+            });
+            
+            const target = document.getElementById(targetId);
+            target.classList.remove('hidden');
+            target.classList.add('block', 'animate-fade-in');
+        }
+    </script>
+</body>
+</html>
